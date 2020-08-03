@@ -32,7 +32,7 @@ func  (a *Agent) hostCandidates() {
 	}
 }
 
-func (a *Agent) getAllIPAddress(ipv6 bool, filterLocal bool) []net.IP {
+func (a *Agent) getAllIPAddress(ipv6 bool) []net.IP {
 	var ips []net.IP
 
 	ifaces, _ := net.Interfaces()
@@ -54,7 +54,7 @@ func (a *Agent) getAllIPAddress(ipv6 bool, filterLocal bool) []net.IP {
 			}
 
 			if !ipv6 {
-				if ip.To4() != nil && filterLocal && ip.String() != "127.0.0.1" {
+				if ip.To4() != nil && ip.String() != "127.0.0.1" {
 					ips = append(ips, ip)
 				}
 			}
@@ -71,4 +71,14 @@ func (a *Agent) GatherCandidates() error {
 		fmt.Println(ip)
 	}
 	return nil
+}
+
+//TODO(CC): add port
+func gatherUDP(ip net.IP) net.PacketConn {
+	zeroPort := net.UDPAddr{
+		IP:   ip,
+		Port: 0,
+	}
+	conn, _ := net.ListenPacket("udp", zeroPort.String())
+	return conn
 }
